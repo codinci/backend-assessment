@@ -1,0 +1,32 @@
+services:
+  web:
+    build: .
+    container_name: flask_app
+    command: python app.py  # Adjust if your entry point is different
+    environment:
+      - FLASK_ENV=development
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    volumes:
+      - .:/flask-backend  
+
+  db:
+    image: postgres:13.4
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

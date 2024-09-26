@@ -13,14 +13,16 @@ def create_app():
     app = Flask(__name__)
     app.secret_key = env.get("APP_SECRET_KEY")
 
-    # Database configuration (SQLite for local dev, PostgreSQL in prod)
-    if env.get('FLASK_ENV') == 'production':
-        app.config['SQLALCHEMY_DATABASE_URI'] = env.get('DATABASE_URL')
-    else:
+    # Check if the environment is development or production
+    if env.get('FLASK_ENV') == 'development':
+        # Use SQLite in development
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///customer_orders.db'
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = env.get('DATABASE_URL')
+
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
-
     with app.app_context():
         db.create_all()
 
